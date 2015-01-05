@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MovieDB">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="MovieDB" content="">
+    <meta name="Komail Shahmir" content="">
+
+    <title>Movie Gallery</title>
+
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/1-col-portfolio.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script> 
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script> 
+    <script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body ng-controller="TypeaheadCtrl" data-ng-init="init()">
+
+    <!-- Navigation -->
+    <div class="topLogo"></div>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="">Home</a>
+                    </li>
+                    <li>
+                        <a href="/logout">Log out</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            
+            <div class="searchBox col-lg-4">
+                <input type="text" name="Movie Name" placeholder="Search Movie Database" ng-model="selected" typeahead-on-select="setYear($item)" typeahead="mymovie.title for mymovie in myMovies($viewValue) | limitTo:8" typeahead-min-length='3'>
+            </div>
+            <div class="col-lg-8">
+                {% raw %}
+                <img class="img-responsive searchItem" ng-src="{{thmbnl}}" alt=""> 
+                {% endraw %}
+                <h4 class="searchItem" ng-bind="year"></h4><h4 class="searchItem" ng-bind="critic"></h4>
+                <input class="btn btn-success searchItem" type="submit" value="Add" ng-click='add()'>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Gallery Overview
+                    
+                </h1>
+                {% block page_content %}
+                <p> loged in as {{current_user.username}}</p>
+                {% endblock%}
+                {% raw %}
+                <h5 float="right" ng-model="statusmsg" ng-show="statustimer">Status: {{statusmsg}}</h5>
+                {% endraw %}
+            </div>
+            
+        </div>
+        <hr>
+        <!-- /.row -->
+
+        <!-- Project One -->
+        <div class="row" ng-repeat="item in homemovies track by $index">
+            <div class="col-md-1">
+                <a href="">
+                    {% raw %}
+                    <img class="img-responsive" ng-src="{{item.thmbnl}}" alt="">
+                    {% endraw %}
+                </a>
+            </div>
+            <div class="col-md-4">
+                {% raw %}
+                <h3 class="movieTitle" >{{item.title}}</h3>
+                {% endraw %}
+                <h4><input type="checkbox" ng-model="item.watched"  ng-click="isChecked(item)"> Watched </h4>{% raw %}
+                <h4>{{item.year}}</h4>
+                <h4>{{item.critic}}</h4>                
+                <h4>My rating:
+                    <select ng-model="item.rate" ng-change="changeRate(item)">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                </h4>
+                {% endraw %}
+                <input class="btn btn-danger" type="submit" value="Delete" ng-click="deletemovie(item)">
+            </div>
+            <div class="col-md-7">
+                {% raw %}
+                <h4>{{item.review}}</h4>
+                
+                <a class="btn btn-primary" data-toggle="collapse" data-target="#{{item.id}}" href="">Edit comment</a>
+                <form id="{{item.id}}" class="collapse out">
+                    <textarea class="commentText" rows="5" cols="50" ng-model="item.review">
+                    </textarea>
+                    <input class="btn btn-primary" type="submit" value="Save" ng-click="addcomment(item.review, item.title)">
+                </form>
+                {% endraw %}
+            </div>
+        </div>
+        <hr>
+
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- <script src="js/jquery.js"></script> -->
+    <!-- <script src="js/bootstrap.min.js"></script>  -->
+    <script>
+        angular.module('MovieDB', ['ui.bootstrap']);
+        function TypeaheadCtrl($scope, $http, $timeout) {
+            $scope.homemovies = [];
+            $scope.statusmsg = ''
+            $scope.statustimer = false;
+            $scope.selected = undefined;
+            $scope.myMovies = function(mname) { 
+              return $http.get("/search/"+mname).then(function(resp){
+                tempresp = resp.data;
+                rep = tempresp.movies;
+              return rep;
+              });
+            };
+
+            $scope.add = function()
+            {
+              var mv = {
+                "title": $scope.ttl,
+                "year": $scope.year,
+                "thmbnl": $scope.thmbnl,
+                "watched":$scope.watched,
+                "critic":$scope.critic,
+                "rate": $scope.rate
+              };
+
+              $http({
+                url: '/add',
+                method: "POST",
+                data: JSON.stringify(mv),
+                headers: {'Content-Type': 'application/json'}
+                }).success(function (data) {
+                    var id = data.id; // assign  $scope.persons here as promise is resolved here 
+                    $scope.homemovies.push({'title':$scope.ttl , 'year':$scope.year, 'id':id, 'thmbnl':$scope.thmbnl, 'watched':$scope.watched, 'critic': $scope.critic});
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                }).error(function (data, status, headers, config) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                });
+            };
+
+            $scope.deletemovie = function(mvitem)
+            {
+              mvid = mvitem.id;
+              var index = $scope.homemovies.indexOf(mvitem);
+              if (index > -1) {
+                  $scope.homemovies.splice(index, 1);
+              };
+              $http({
+                url: '/deletemovie',
+                method: "POST",
+                data: JSON.stringify({'mvid':mvid}),
+                headers: {'Content-Type': 'application/json'}
+                }).success(function (data) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                    
+                }).error(function (data, status, headers, config) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+
+                });
+            };
+
+            $scope.setYear = function(y){
+              $scope.ttl = y.title;
+              $scope.year = y.year;
+              $scope.critic = y.critic;
+              $scope.thmbnl = y.thumbnail;
+            };
+
+            $scope.addcomment = function(cmnt, ttl)
+            {
+              $http({
+                url: '/addcomment',
+                method: "POST",
+                data: JSON.stringify({'comment':cmnt, 'title':ttl}),
+                headers: {'Content-Type': 'application/json'}
+                }).success(function (data) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                }).error(function (data, status, headers, config) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                });   
+            };
+
+
+            $scope.isChecked = function(ckd)
+            {
+              var mvid = ckd.id;
+              var chkd = !ckd.watched;
+              ckd.watched = chkd;
+              $http({
+                url: '/checked',
+                method: "POST",
+                data: JSON.stringify({'checked':chkd, 'mvid':mvid}),
+                headers: {'Content-Type': 'application/json'}
+                }).success(function (data) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                }).error(function (data, status, headers, config) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                });   
+            };
+
+
+            $scope.changeRate = function(ckd)
+            {
+              var mvid = ckd.id;
+              chkd = ckd.rate;
+              $http({
+                url: '/rate',
+                method: "POST",
+                data: JSON.stringify({'rate':chkd, 'mvid':mvid}),
+                headers: {'Content-Type': 'application/json'}
+                }).success(function (data) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                }).error(function (data, status, headers, config) {
+                    $scope.statusmsg = data.status;
+                    $scope.statustimer = true;
+                    $timeout(function(){
+                       $scope.statustimer = false;
+                    }, 10000);
+                });   
+            };
+
+
+            $scope.init = function () {
+              return $http.get("/fetch").then(function(resp){
+                tmp = resp.data;
+                $scope.homemovies = tmp.movies;
+              });
+            };
+
+    };
+    </script>
+
+</body>
+
+</html>

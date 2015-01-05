@@ -1,0 +1,68 @@
+
+body { 
+  background: url(images/background.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body{
+	color: white;
+}
+
+.page-header{
+	margin: 0;
+	border-bottom: none;
+}
+
+.topLogo{
+	background: url(images/popcorn.png) no-repeat center;
+	height: 120px;
+}
+
+
+.row{
+	background-color: rgba(0,0,0,0.4);
+	padding: 20px 0;
+}
+
+.movieTitle{
+	margin-top: 0;
+}
+
+.searchBox{
+	padding-top: 10px;
+}
+.searchItem{
+	float: left;
+	margin-right: 60px;
+}
+
+input[type="text"], textarea {
+  background-color : rgba(0,0,0,0.4); 
+}
+input, textarea {
+  background-color : rgba(0,0,0,0.4); 
+}
+
+input[type="submit"]{
+  display: block;
+}
+
+option { 
+    /* Whatever color  you want */
+    background-color: rgb(104, 81, 81);
+}
+select { 
+    /* Whatever color  you want */
+    background-color: rgb(104, 81, 81);
+}
+
+.delButton{
+}
+
+.commentText{
+	margin-top: 3px;
+	padding: 5px 3px;
+}
